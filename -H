@@ -1,0 +1,1 @@
+{"errors":[{"message":"Invalid Authorization header format","long_message":"Invalid Authorization header format. Must be 'Bearer \u003cYOUR_API_KEY\u003e'","code":"authorization_header_format_invalid"}],"clerk_trace_id":"5f35973425cb36f2ef68d20a61e2c0e3"}
