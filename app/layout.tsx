@@ -32,11 +32,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Temporarily disable proxy URL to avoid CORS issues
+  // The proxy URL must exactly match the domain (www vs non-www matters)
+  // When ready, set it correctly in Vercel: https://www.whatifwhynot.pro/__clerk/
+  // Clerk will work fine without a proxy - it will load from its CDN directly
+  const clerkProxyUrl = undefined;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ClerkProvider
-          proxyUrl={process.env.NEXT_PUBLIC_CLERK_PROXY_URL}
+          {...(clerkProxyUrl ? { proxyUrl: clerkProxyUrl } : {})}
           appearance={{
             variables: {
               colorPrimary: '#00CED1',

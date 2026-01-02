@@ -8,7 +8,13 @@ import { ArrowRight, Play } from "lucide-react";
 export const dynamic = 'force-dynamic';
 
 const Page = async () => {
-  const companions = await getAllCompanions({ limit: 6 });
+  let companions = [];
+  try {
+    companions = await getAllCompanions({ limit: 6 });
+  } catch (error) {
+    console.error('Failed to load companions:', error);
+    // Continue with empty array if database query fails
+  }
 
   return (
     <main className="relative">
