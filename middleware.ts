@@ -4,8 +4,22 @@ import type { NextRequest } from 'next/server'
 
 function proxyMiddleware(req: NextRequest) {
   if (req.nextUrl.pathname.match('__clerk')) {
+    const proxyUrlEnv = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
+    
+    // Only use proxy if it's properly configured
+    // Check if proxy URL is valid and matches the current domain to avoid CORS issues
+    const isValidProxyUrl = proxyUrlEnv && 
+      proxyUrlEnv.endsWith('/__clerk/') && 
+      !proxyUrlEnv.includes('//npm') && // Avoid double slashes
+      proxyUrlEnv.startsWith('https://');
+    
+    // If proxy URL is misconfigured, don't use it (return null to skip proxy)
+    if (!isValidProxyUrl) {
+      return null;
+    }
+    
     const proxyHeaders = new Headers(req.headers)
-    proxyHeaders.set('Clerk-Proxy-Url', process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '')
+    proxyHeaders.set('Clerk-Proxy-Url', proxyUrlEnv)
     proxyHeaders.set('Clerk-Secret-Key', process.env.CLERK_SECRET_KEY || '')
     proxyHeaders.set('X-Forwarded-For', req.headers.get('X-Forwarded-For') || req.headers.get('x-forwarded-for') || '')
 
