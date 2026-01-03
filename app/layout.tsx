@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "Experience the future of education with personalized AI companions. Learn, grow, and excel with interactive voice conversations tailored to your needs.",
   keywords: ["AI learning", "education", "voice AI", "personalized learning", "AMRO Academy"],
   icons: {
-    icon: "/images/amro-ai-academy/favicon.ico",
+    icon: "/favicon.ico",
     apple: "/images/amro-ai-academy/apple-icon.png",
   },
 };
@@ -32,15 +32,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Explicitly disable proxy URL to avoid CORS issues
-  // Even if NEXT_PUBLIC_CLERK_PROXY_URL is set in Vercel, we override it here
-  // The proxy URL must exactly match the domain (www vs non-www matters)
-  // When ready, set it correctly in Vercel: https://www.whatifwhynot.pro/__clerk/
-  // Clerk will work fine without a proxy - it will load from its CDN directly
-  
-  // Force override: explicitly set to undefined to prevent Clerk from using env var
-  const proxyUrlEnv = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
-  const clerkProxyUrl = undefined; // Always disabled to prevent CORS
+  // Use the proxy URL from environment if configured and valid
+  // The proxy URL must end with __clerk/ and use https
+  const clerkProxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
 
   return (
     <html lang="en" suppressHydrationWarning>
