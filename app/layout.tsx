@@ -32,15 +32,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Use the proxy URL from environment if configured and valid
-  // The proxy URL must end with __clerk/ and use https
-  const clerkProxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ClerkProvider
-          proxyUrl={clerkProxyUrl}
           appearance={{
             variables: {
               colorPrimary: '#00CED1',

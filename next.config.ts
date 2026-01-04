@@ -13,20 +13,6 @@ const nextConfig: NextConfig = {
       remotePatterns: [
           { hostname: 'img.clerk.com'}
       ]
-  },
-  // Override NEXT_PUBLIC_CLERK_PROXY_URL if it's misconfigured
-  env: {
-    // Check if proxy URL is valid, if not, set it to empty string
-    NEXT_PUBLIC_CLERK_PROXY_URL: (() => {
-      const proxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
-      if (!proxyUrl) return undefined;
-      // Validate proxy URL
-      const isValid = proxyUrl.endsWith('/__clerk/') && 
-                      !proxyUrl.includes('//npm') && 
-                      proxyUrl.startsWith('https://');
-      // If invalid, return undefined to disable proxy
-      return isValid ? proxyUrl : undefined;
-    })(),
   }
 };
 
