@@ -3,8 +3,10 @@ import CompanionCard from "@/components/CompanionCard";
 import { getSubjectColor } from "@/lib/utils";
 import SearchInput from "@/components/SearchInput";
 import SubjectFilter from "@/components/SubjectFilter";
-import { Users, Search, Filter } from "lucide-react";
+import { Users, Search, Filter, Plus, Sparkles } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +21,7 @@ const CompanionsLibrary = async ({
     const topic = filters?.topic ? String(filters.topic) : '';
 
     const companions = await getAllCompanions({ subject, topic }) || [];
+    const { userId } = await auth();
 
   return (
     <main className="max-w-7xl mx-auto">
@@ -37,18 +40,29 @@ const CompanionsLibrary = async ({
 
       {/* Header */}
       <div className="mb-12">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-400/10 to-blue-500/10 border border-cyan-400/20">
-            <Users className="w-6 h-6 text-primary" />
+        <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-400/10 to-blue-500/10 border border-cyan-400/20">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold">
+                Companion Library
+              </h1>
+              <p className="text-foreground-secondary mt-1">
+                Explore {companions.length} AI learning companions
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold">
-              Companion Library
-            </h1>
-            <p className="text-foreground-secondary mt-1">
-              Explore {companions.length} AI learning companions
-            </p>
-          </div>
+          {userId && (
+            <Link href="/companions/new">
+              <button className="btn-primary flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 active:scale-95 whitespace-nowrap">
+                <Plus className="w-5 h-5" />
+                <Sparkles className="w-4 h-4" />
+                Create Companion
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Search & Filter */}
