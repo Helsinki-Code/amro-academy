@@ -23,32 +23,38 @@ export const createCompanion = async (formData: CreateCompanion) => {
 }
 
 export const getAllCompanions = async ({ limit = 10, page = 1, subject, topic }: GetAllCompanions) => {
-    let sql = 'SELECT * FROM companions WHERE 1=1';
-    const params: any[] = [];
-    let paramCount = 0;
+    try {
+        let sql = 'SELECT * FROM companions WHERE 1=1';
+        const params: any[] = [];
+        let paramCount = 0;
 
-    if (subject && topic) {
-        paramCount++;
-        sql += ` AND LOWER(subject) LIKE LOWER($${paramCount})`;
-        params.push(`%${subject}%`);
-        paramCount++;
-        sql += ` AND (LOWER(topic) LIKE LOWER($${paramCount}) OR LOWER(name) LIKE LOWER($${paramCount}))`;
-        params.push(`%${topic}%`);
-    } else if (subject) {
-        paramCount++;
-        sql += ` AND LOWER(subject) LIKE LOWER($${paramCount})`;
-        params.push(`%${subject}%`);
-    } else if (topic) {
-        paramCount++;
-        sql += ` AND (LOWER(topic) LIKE LOWER($${paramCount}) OR LOWER(name) LIKE LOWER($${paramCount}))`;
-        params.push(`%${topic}%`);
+        if (subject && topic) {
+            paramCount++;
+            sql += ` AND LOWER(subject) LIKE LOWER($${paramCount})`;
+            params.push(`%${subject}%`);
+            paramCount++;
+            sql += ` AND (LOWER(topic) LIKE LOWER($${paramCount}) OR LOWER(name) LIKE LOWER($${paramCount}))`;
+            params.push(`%${topic}%`);
+        } else if (subject) {
+            paramCount++;
+            sql += ` AND LOWER(subject) LIKE LOWER($${paramCount})`;
+            params.push(`%${subject}%`);
+        } else if (topic) {
+            paramCount++;
+            sql += ` AND (LOWER(topic) LIKE LOWER($${paramCount}) OR LOWER(name) LIKE LOWER($${paramCount}))`;
+            params.push(`%${topic}%`);
+        }
+
+        sql += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+        params.push(limit, (page - 1) * limit);
+
+        const result = await query(sql, params);
+        return result.rows;
+    } catch (error) {
+        console.error('Error in getAllCompanions:', error);
+        // Return empty array on error to prevent page crash
+        return [];
     }
-
-    sql += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
-    params.push(limit, (page - 1) * limit);
-
-    const result = await query(sql, params);
-    return result.rows;
 }
 
 export const getCompanion = async (id: string) => {
