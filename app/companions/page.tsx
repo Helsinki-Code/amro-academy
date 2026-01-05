@@ -8,12 +8,17 @@ import Image from "next/image";
 
 export const dynamic = 'force-dynamic';
 
-const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
-  const filters = await searchParams;
-  const subject = filters.subject ? filters.subject : '';
-  const topic = filters.topic ? filters.topic : '';
+const CompanionsLibrary = async ({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
+}) => {
+  try {
+    const filters = await searchParams;
+    const subject = filters?.subject ? String(filters.subject) : '';
+    const topic = filters?.topic ? String(filters.topic) : '';
 
-  const companions = await getAllCompanions({ subject, topic });
+    const companions = await getAllCompanions({ subject, topic }) || [];
 
   return (
     <main className="max-w-7xl mx-auto">
@@ -89,7 +94,34 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
         )}
       </section>
     </main>
-  );
+    );
+  } catch (error) {
+    console.error('Error in CompanionsLibrary:', error);
+    return (
+      <main className="max-w-7xl mx-auto">
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/images/amro-ai-academy/amro-ai-academy-logo.png"
+            alt="AMRO Academy"
+            width={140}
+            height={50}
+            className="object-contain h-12 w-auto"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-foreground-muted/10 flex items-center justify-center mb-6">
+            <Search className="w-8 h-8 text-foreground-muted" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Unable to load companions</h3>
+          <p className="text-foreground-secondary max-w-md">
+            Please try refreshing the page or contact support if the issue persists.
+          </p>
+        </div>
+      </main>
+    );
+  }
 };
 
 export default CompanionsLibrary;

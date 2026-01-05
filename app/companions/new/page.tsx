@@ -4,15 +4,22 @@ import { redirect } from "next/navigation";
 import { newCompanionPermissions } from "@/lib/actions/companion.actions";
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, Lock, ArrowRight, Wand2 } from "lucide-react";
+import { Sparkles, Lock, ArrowRight, Wand2, AlertCircle } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
 const NewCompanion = async () => {
-  const { userId } = await auth();
-  if (!userId) redirect('/sign-in');
+  try {
+    const { userId } = await auth();
+    if (!userId) redirect('/sign-in');
 
-  const canCreateCompanion = await newCompanionPermissions();
+    let canCreateCompanion = false;
+    try {
+      canCreateCompanion = await newCompanionPermissions();
+    } catch (error) {
+      console.error('Error checking companion permissions:', error);
+      canCreateCompanion = false;
+    }
 
   return (
     <main className="max-w-3xl mx-auto py-8">
@@ -101,7 +108,42 @@ const NewCompanion = async () => {
         </article>
       )}
     </main>
-  );
+    );
+  } catch (error) {
+    console.error('Error in NewCompanion component:', error);
+    return (
+      <main className="max-w-3xl mx-auto py-8">
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/images/amro-ai-academy/amro-ai-academy-logo.png"
+            alt="AMRO Academy"
+            width={140}
+            height={50}
+            className="object-contain h-12 w-auto"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="relative p-8 sm:p-10 rounded-2xl bg-card border border-border overflow-hidden">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+              <AlertCircle className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Unable to load create page</h3>
+            <p className="text-foreground-secondary max-w-md mb-4">
+              An error occurred while loading the companion creation page. Please try refreshing the page.
+            </p>
+            <Link
+              href="/"
+              className="btn-primary px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+            >
+              Return to Home
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 };
 
 export default NewCompanion;

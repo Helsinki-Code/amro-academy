@@ -8,9 +8,10 @@ import { ArrowRight, Play } from "lucide-react";
 export const dynamic = 'force-dynamic';
 
 const Page = async () => {
-  const companions = await getAllCompanions({ limit: 6 });
+  try {
+    const companions = (await getAllCompanions({ limit: 6 })) || [];
 
-  return (
+    return (
     <main className="relative">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-12 pb-16 overflow-hidden">
@@ -314,7 +315,22 @@ const Page = async () => {
         </div>
       </section>
     </main>
-  );
+    );
+  } catch (error) {
+    console.error('Error in Page:', error);
+    return (
+      <main className="relative">
+        <section className="relative min-h-screen flex items-center justify-center pt-12 pb-16 overflow-hidden">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-3xl font-bold mb-4">Something went wrong</h1>
+            <p className="text-muted-foreground">
+              Please try refreshing the page or contact support if the issue persists.
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 };
 
 export default Page;

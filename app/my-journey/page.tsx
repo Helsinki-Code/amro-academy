@@ -17,31 +17,74 @@ import Image from "next/image";
 import CompanionsList from "@/components/CompanionsList";
 import BadgeDisplay from "@/components/BadgeDisplay";
 import Link from "next/link";
+import { AlertCircle } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
 const Profile = async () => {
-  const user = await currentUser();
+  try {
+    const user = await currentUser();
 
-  if (!user) redirect("/sign-in");
+    if (!user) redirect("/sign-in");
 
-  const companions = await getUserCompanions(user.id);
-  const sessionHistory = await getUserSessions(user.id);
-  const bookmarkedCompanions = await getBookmarkedCompanions(user.id);
-  const certificates = await getUserCertificates(user.id);
-  
-  // Check and award badges based on user progress
-  await checkAndAwardBadges(user.id);
-  let userBadges = await getUserBadges(user.id);
-  
-  // Ensure student badge exists (awarded on signup)
-  if (!userBadges.includes('student')) {
-    const { awardBadge } = await import("@/lib/actions/badge.actions");
-    const result = await awardBadge(user.id, 'student');
-    if (result.success) {
-      userBadges = await getUserBadges(user.id);
+    let companions: any[] = [];
+    let sessionHistory: any[] = [];
+    let bookmarkedCompanions: any[] = [];
+    let certificates: any[] = [];
+    let userBadges: string[] = [];
+
+    try {
+      companions = await getUserCompanions(user.id) || [];
+    } catch (error) {
+      console.error('Error fetching companions:', error);
+      companions = [];
     }
-  }
+
+    try {
+      sessionHistory = await getUserSessions(user.id) || [];
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+      sessionHistory = [];
+    }
+
+    try {
+      bookmarkedCompanions = await getBookmarkedCompanions(user.id) || [];
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error);
+      bookmarkedCompanions = [];
+    }
+
+    try {
+      certificates = await getUserCertificates(user.id) || [];
+    } catch (error) {
+      console.error('Error fetching certificates:', error);
+      certificates = [];
+    }
+    
+    try {
+      await checkAndAwardBadges(user.id);
+    } catch (error) {
+      console.error('Error checking badges:', error);
+    }
+
+    try {
+      userBadges = await getUserBadges(user.id) || [];
+    } catch (error) {
+      console.error('Error fetching badges:', error);
+      userBadges = [];
+    }
+    
+    try {
+      if (!userBadges.includes('student')) {
+        const { awardBadge } = await import("@/lib/actions/badge.actions");
+        const result = await awardBadge(user.id, 'student');
+        if (result.success) {
+          userBadges = await getUserBadges(user.id) || [];
+        }
+      }
+    } catch (error) {
+      console.error('Error awarding student badge:', error);
+    }
 
   return (
     <main>
@@ -201,6 +244,39 @@ const Profile = async () => {
         </AccordionItem>
       </Accordion>
     </main>
-  );
+    );
+  } catch (error) {
+    console.error('Error in Profile component:', error);
+    return (
+      <main className="max-w-7xl mx-auto">
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/images/amro-ai-academy/amro-ai-academy-logo.png"
+            alt="AMRO Academy"
+            width={140}
+            height={50}
+            className="object-contain h-12 w-auto"
+            priority
+            unoptimized
+          />
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Unable to load your journey</h3>
+          <p className="text-foreground-secondary max-w-md mb-4">
+            An error occurred while loading your profile. Please try refreshing the page.
+          </p>
+          <Link
+            href="/"
+            className="btn-primary px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+          >
+            Return to Home
+          </Link>
+        </div>
+      </main>
+    );
+  }
 };
 export default Profile;
