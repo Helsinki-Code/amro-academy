@@ -17,13 +17,77 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://whatifwhynot.pro";
+
 export const metadata: Metadata = {
-  title: "AMRO Academy | AI-Powered Learning Platform",
-  description: "Experience the future of education with personalized AI companions. Learn, grow, and excel with interactive voice conversations tailored to your needs.",
-  keywords: ["AI learning", "education", "voice AI", "personalized learning", "AMRO Academy"],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "AMRO Academy | AI-Powered Learning Platform",
+    template: "%s | AMRO Academy"
+  },
+  description: "Experience the future of education with personalized AI companions. Learn, grow, and excel with interactive voice conversations tailored to your needs. Create custom AI tutors, engage in real-time voice conversations, and master any subject.",
+  keywords: [
+    "AI learning",
+    "education",
+    "voice AI",
+    "personalized learning",
+    "AMRO Academy",
+    "AI tutors",
+    "online education",
+    "interactive learning",
+    "voice conversations",
+    "AI companions",
+    "educational technology",
+    "e-learning",
+    "adaptive learning"
+  ],
+  authors: [{ name: "AMRO Academy" }],
+  creator: "AMRO Academy",
+  publisher: "AMRO Academy",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: "/favicon.ico",
     apple: "/images/amro-ai-academy/apple-icon.png",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "AMRO Academy",
+    title: "AMRO Academy | AI-Powered Learning Platform",
+    description: "Experience the future of education with personalized AI companions. Learn, grow, and excel with interactive voice conversations tailored to your needs.",
+    images: [
+      {
+        url: `${siteUrl}/images/amro-ai-academy/amro-ai-academy-logo.png`,
+        width: 1200,
+        height: 400,
+        alt: "AMRO Academy - AI-Powered Learning Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AMRO Academy | AI-Powered Learning Platform",
+    description: "Experience the future of education with personalized AI companions. Learn, grow, and excel with interactive voice conversations.",
+    images: [`${siteUrl}/images/amro-ai-academy/amro-ai-academy-logo.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: siteUrl,
   },
 };
 
@@ -32,8 +96,30 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://whatifwhynot.pro";
+  
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "AMRO Academy",
+              "description": "AI-Powered Learning Platform with personalized AI companions for interactive voice conversations",
+              "url": siteUrl,
+              "logo": `${siteUrl}/images/amro-ai-academy/amro-ai-academy-logo.png`,
+              "sameAs": [],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "Customer Service"
+              }
+            }),
+          }}
+        />
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
         <ClerkProvider
           appearance={{
